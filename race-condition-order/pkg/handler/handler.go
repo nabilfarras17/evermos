@@ -24,6 +24,7 @@ func New(config *config.Config, router *mux.Router, orderHandler *order.OrderHan
 	h := &RootHandler{
 		config:         config,
 		router:         router,
+		orderHandler:   orderHandler,
 		isShuttingDown: false,
 	}
 	return h
