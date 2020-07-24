@@ -2,14 +2,13 @@ package order
 
 import (
 	"context"
-	"fmt"
 	"github.com/evermos/race-condition-order/config"
 	"github.com/evermos/race-condition-order/nsq/producer"
 	"github.com/evermos/race-condition-order/pkg/pcatalogue"
+	"github.com/evermos/race-condition-order/pkg/util"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
-	"math/rand"
 	"time"
 )
 
@@ -80,7 +79,7 @@ func (s *Service) SaveOrder(ctx context.Context, input SaveOrderRequest) (res Or
 
 	order := Order{
 		ID:         uuid.NewV4(),
-		PublicID:   input.PhoneNumber + fmt.Sprintf("%v", rand.Intn(5)),
+		PublicID:   input.PhoneNumber + util.RandomString(5),
 		Total:      input.Total,
 		Status:     PendingOrderStatus,
 		Created:    input.Created,
@@ -105,7 +104,7 @@ func (s *Service) ProcessOrder(ctx context.Context, order Order) (err error) {
 	}
 	products := s.pcatalogueService.BulkGetProductBySkus(ctx, skus)
 	if len(products) == 0 {
-		err = errors.New("SKU not found!")
+		err = errors.New("[Error] SKU not found!")
 		return
 	}
 
