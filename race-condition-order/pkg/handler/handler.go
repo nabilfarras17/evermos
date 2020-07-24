@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/evermos/race-condition-order/config"
 	"github.com/evermos/race-condition-order/pkg/order"
+	"github.com/evermos/race-condition-order/pkg/pcatalogue"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -13,19 +14,21 @@ import (
 )
 
 type RootHandler struct {
-	config         *config.Config
-	router         *mux.Router
-	orderHandler   *order.OrderHandler
-	isShuttingDown bool
+	config            *config.Config
+	router            *mux.Router
+	orderHandler      *order.OrderHandler
+	pcatalogueHandler *pcatalogue.PcatalogueHandler
+	isShuttingDown    bool
 }
 
 // Initiate RootHandler
-func New(config *config.Config, router *mux.Router, orderHandler *order.OrderHandler) *RootHandler {
+func New(config *config.Config, router *mux.Router, orderHandler *order.OrderHandler, pcatalogueHandler *pcatalogue.PcatalogueHandler) *RootHandler {
 	h := &RootHandler{
-		config:         config,
-		router:         router,
-		orderHandler:   orderHandler,
-		isShuttingDown: false,
+		config:            config,
+		router:            router,
+		orderHandler:      orderHandler,
+		pcatalogueHandler: pcatalogueHandler,
+		isShuttingDown:    false,
 	}
 	return h
 }

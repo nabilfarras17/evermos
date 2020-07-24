@@ -3,6 +3,7 @@ package order
 import (
 	"github.com/evermos/race-condition-order/pkg/request"
 	"github.com/evermos/race-condition-order/pkg/response"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
@@ -26,11 +27,18 @@ func (oh OrderHandler) SaveOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if validErrs := data.validate(); len(validErrs) > 0 {
+		err = errors.Errorf("validationError: %v", validErrs)
+		response.Failed(w, http.StatusBadRequest, err)
+		return
+	}
+
 	ctx := r.Context()
-	err = oh.service.SaveOrder(ctx)
+	res, err := oh.service.SaveOrder(ctx, data)
 	if err != nil {
 		log.Errorf("%v", err)
 		response.Failed(w, http.StatusInternalServerError, err)
+		return
 	}
-	response.Success(w, http.StatusAccepted, "OK")
+	response.Success(w, http.StatusAccepted, res)
 }

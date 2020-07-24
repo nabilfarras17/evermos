@@ -6,6 +6,7 @@ import (
 	"github.com/evermos/race-condition-order/nsq/producer"
 	"github.com/evermos/race-condition-order/pkg/handler"
 	"github.com/evermos/race-condition-order/pkg/order"
+	"github.com/evermos/race-condition-order/pkg/pcatalogue"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -21,7 +22,11 @@ func main() {
 	}
 
 	// Setup dependency for each domain
-	orderService := order.NewService(producer)
+	// Pcatalogue
+	pcatalogueService := pcatalogue.NewService()
+	pcatalogueHandler := pcatalogue.NewPcatalogueHandler(pcatalogueService)
+	// Order
+	orderService := order.NewService(conf, producer, pcatalogueService)
 	orderHandler := order.NewOrderHandler(orderService)
 
 	// Setup consumer
@@ -29,7 +34,7 @@ func main() {
 		conf.ConsumerName,
 		conf.ConsumerEnabled,
 		conf.ConsumerHost,
-		conf.ConsumerTopic,
+		conf.Topic,
 		orderService,
 	)
 	err = consumer.Start()
@@ -40,7 +45,7 @@ func main() {
 
 	// Setup rootHandler
 	router := mux.NewRouter()
-	rh := handler.New(conf, router, &orderHandler)
+	rh := handler.New(conf, router, &orderHandler, &pcatalogueHandler)
 	rh.InitRoutes()
 	rh.Run()
 }

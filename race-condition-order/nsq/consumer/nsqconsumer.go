@@ -43,16 +43,18 @@ func (nc *NSQConsumer) Enabled() bool {
 }
 
 func (nc *NSQConsumer) Start() error {
-	err := nc.createConsumer()
-	if err != nil {
-		return err
-	}
-
-	nc.nsqConsumer.AddHandler(&nc.eventProcessor)
-	err = nc.nsqConsumer.ConnectToNSQD(nc.host)
-	if err != nil {
-		log.Errorf("%v", err)
-		return err
+	if nc.enabled {
+		err := nc.createConsumer()
+		if err != nil {
+			return err
+		}
+		nc.nsqConsumer.AddHandler(&nc.eventProcessor)
+		err = nc.nsqConsumer.ConnectToNSQD(nc.host)
+		if err != nil {
+			log.Errorf("%v", err)
+			return err
+		}
+		return nil
 	}
 	return nil
 }

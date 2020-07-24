@@ -14,9 +14,9 @@ type Config struct {
 	// NSQ broker
 	ConsumerName    string `envconfig:"CONSUMER_NAME" default:"order"`
 	ConsumerEnabled bool   `envconfig:"CONSUMER_ENABLE" default:"true"`
-	ConsumerHost    string `envconfig:"CONSUMER_HOST" default:"localhost:4160"`
-	ConsumerTopic   string `envconfig:"CONSUMER_TOPIC" default:"order-save"`
-	ProducerHost    string `envconfig:"PRODUCER_HOST" default:"localhost:4160"`
+	ConsumerHost    string `envconfig:"CONSUMER_HOST" default:"localhost:4150"`
+	Topic           string `envconfig:"CONSUMER_TOPIC" default:"order-save"`
+	ProducerHost    string `envconfig:"PRODUCER_HOST" default:"localhost:4150"`
 }
 
 func InitConfig() *Config {

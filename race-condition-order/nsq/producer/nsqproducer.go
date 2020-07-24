@@ -27,10 +27,9 @@ func (np *NSQProducer) Emit(topic string, message interface{}) error {
 	if err != nil {
 		return err
 	}
-
 	err = np.producer.Publish(topic, payload)
 	if err != nil {
-		log.Fatal(err)
+		log.Errorf("%v", err)
 		return err
 	}
 	return nil
