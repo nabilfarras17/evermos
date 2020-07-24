@@ -7,10 +7,10 @@ import (
 )
 
 type Soldier struct {
-	ID        uuid.UUID  `json:"id"`
-	PublicID  string     `json:"publicId"`
-	Name      string     `json:"name"`
-	Gun       weapon.Gun `json:"gun"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt *time.Time `json:"updatedAt"`
+	ID         uuid.UUID  `json:"id"`
+	IdentifyID string     `json:"identifyId"`
+	Name       string     `json:"name"`
+	Gun        weapon.Gun `json:"gun"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  *time.Time `json:"updatedAt"`
 }

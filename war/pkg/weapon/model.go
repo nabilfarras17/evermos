@@ -11,11 +11,22 @@ type Gun struct {
 	Magazines    []Magazine `json:"magazines"`
 }
 
+func (g *Gun) IsVerified() bool {
+	for _, magazine := range g.Magazines {
+		if magazine.IsVerified {
+			return true
+		}
+		return false
+	}
+	return false
+}
+
 type Magazine struct {
-	ID                 uuid.UUID `json:"id"`
-	Bullets            []Bullet  `json:"_"`
-	CurrentTotalBullet int       `json:"currentTotalBullet"`
-	MaxTotalBullet     int       `json:"maxTotalBullet"`
+	ID             uuid.UUID `json:"id"`
+	GunID          uuid.UUID `json:"gunId"`
+	IsVerified     bool      `json:"isVerified"`
+	Bullets        []Bullet  `json:"-"`
+	MaxTotalBullet int       `json:"maxTotalBullet"`
 }
 
 type Bullet struct{}
