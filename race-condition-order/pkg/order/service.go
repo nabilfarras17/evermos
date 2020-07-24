@@ -41,7 +41,7 @@ func (s *Service) SaveOrder(ctx context.Context, input SaveOrderRequest) (res Or
 	}
 	products := s.pcatalogueService.BulkGetProductBySkus(ctx, skus)
 	if len(products) == 0 {
-		err = errors.New("SKU not found!")
+		err = errors.New("[Error] SKU not found!")
 		return
 	}
 
@@ -56,7 +56,7 @@ func (s *Service) SaveOrder(ctx context.Context, input SaveOrderRequest) (res Or
 		if product, ok := productMap[item.SKU]; ok {
 			total += product.Price
 			if item.Quantity > product.Quantity {
-				err = errors.Errorf("SKU: %v out of stock!", product.SKU)
+				err = errors.Errorf("[Error] SKU: %v out of stock!", product.SKU)
 				return
 			}
 			orderItem := OrderItem{
@@ -69,12 +69,12 @@ func (s *Service) SaveOrder(ctx context.Context, input SaveOrderRequest) (res Or
 			}
 			orderItems = append(orderItems, orderItem)
 		} else {
-			err = errors.New("SKU not found!")
+			err = errors.New("[Error] SKU not found!")
 			return
 		}
 	}
 	if input.Total != total {
-		err = errors.New("Total input is invalid!")
+		err = errors.New("[Error] Total input is invalid!")
 		return
 	}
 
@@ -114,17 +114,33 @@ func (s *Service) ProcessOrder(ctx context.Context, order Order) (err error) {
 		productMap[product.SKU] = product
 	}
 
+	isQuantityExceed := true
 	for _, item := range order.OrderItems {
 		if product, ok := productMap[item.SKU]; ok {
 			if item.Quantity > product.Quantity {
-				err = errors.Errorf("SKU: %v out of stock!", product.SKU)
-				return
+				log.Errorf("[Error] SKU: %v out of stock!", product.SKU)
+				isQuantityExceed = false
+				break
 			}
 			s.pcatalogueService.ReduceQuantityBySKU(ctx, item.SKU, item.Quantity)
 		} else {
-			err = errors.New("SKU not found!")
+			err = errors.New("[Error] SKU not found!")
 			return
 		}
 	}
+	if isQuantityExceed {
+		order.Status = SuccessOrderStatus
+	} else {
+		order.Status = CancelledOrderStatus
+	}
+	_, err = s.repository.UpdateOrder(ctx, order)
+	if err != nil {
+		return
+	}
+	log.Infof("Success processed order: %v on publicID: %v", order, order.PublicID)
 	return nil
+}
+
+func (s *Service) GetOrderByPublicID(ctx context.Context, publicID string) (res Order, err error) {
+	return s.repository.GetOrderByPublicID(ctx, publicID)
 }
