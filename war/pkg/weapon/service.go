@@ -6,7 +6,6 @@ import (
 	"github.com/evermos/war/pkg/util"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
-	// log "github.com/sirupsen/logrus"
 	"math/rand"
 )
 
