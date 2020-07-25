@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
+	"sync"
 	"time"
 )
 
 var dummyProductMap map[string]Product
+var lock = sync.RWMutex{}
 
 type Repository struct{}
 
@@ -34,6 +36,8 @@ func NewRepository() Repository {
 }
 
 func (r *Repository) BulkGetProductBySkus(ctx context.Context, skus []string) (res []Product) {
+	lock.RLock()
+	defer lock.RUnlock()
 	for idx := range skus {
 		if product, ok := dummyProductMap[skus[idx]]; ok {
 			res = append(res, product)
@@ -45,9 +49,11 @@ func (r *Repository) BulkGetProductBySkus(ctx context.Context, skus []string) (r
 }
 
 func (r *Repository) ReduceQuantityBySKU(ctx context.Context, sku string, quantity int) (res Product) {
+	lock.Lock()
+	defer lock.Unlock()
 	if product, ok := dummyProductMap[sku]; ok {
 		currentQty := product.Quantity - quantity
-		if currentQty != 0 {
+		if currentQty >= 0 {
 			product.Quantity = currentQty
 			dummyProductMap[product.SKU] = product
 		}
@@ -56,11 +62,9 @@ func (r *Repository) ReduceQuantityBySKU(ctx context.Context, sku string, quanti
 	return Product{}
 }
 
-func (r *Repository) ReduceQuantityBySKUS(ctx context.Context, skus []string) error {
-	return nil
-}
-
 func (r *Repository) ResolveProductBySKU(ctx context.Context, sku string) *Product {
+	lock.RLock()
+	defer lock.RUnlock()
 	if product, ok := dummyProductMap[sku]; ok {
 		return &product
 	}
