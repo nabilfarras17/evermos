@@ -22,3 +22,22 @@ func (r *Repository) InsertGun(ctx context.Context, gun Gun) (res Gun, err error
 	gunMap[gun.SerialNumber] = gun
 	return gun, nil
 }
+
+func (r *Repository) UpdateGun(ctx context.Context, gun Gun) (res Gun, err error) {
+	if _, ok := gunMap[gun.SerialNumber]; !ok {
+		err = errors.Errorf("Gun with serialNumber: %v not exists!", gun.SerialNumber)
+		return
+	}
+	gunMap[gun.SerialNumber] = gun
+	return gun, nil
+}
+
+func (r *Repository) GetGunBySerialNumber(ctx context.Context, serialNumber string) (res Gun, err error) {
+	if gun, ok := gunMap[serialNumber]; ok {
+		res = gun
+		return
+	} else {
+		err = errors.Errorf("Gun with serialNumber: %v not exists!", serialNumber)
+		return
+	}
+}

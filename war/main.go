@@ -11,7 +11,7 @@ import (
 func main() {
 	conf := config.InitConfig()
 	// Setup dependency for each domain
-	weaponService := weapon.NewService()
+	weaponService := weapon.NewService(conf)
 	soldierService := soldier.NewService(weaponService)
 	soldierHandler := soldier.NewSoldierHandler(soldierService)
 

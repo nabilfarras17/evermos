@@ -20,3 +20,15 @@ func (c *CreateSoldierRequest) validate() url.Values {
 	}
 	return errs
 }
+
+type LoadBulletRequest struct {
+	Bullets int `json:"bullets"`
+}
+
+func (l *LoadBulletRequest) validate() url.Values {
+	errs := url.Values{}
+	if l.Bullets == 0 {
+		errs.Add("bullets", "The bullets field is required!")
+	}
+	return errs
+}
